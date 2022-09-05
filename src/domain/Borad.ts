@@ -37,12 +37,15 @@ export class Board {
         const rev = (p: Point, next: (point: Point) => Point,  stones: Point[] = []): void => {
             const [pastX, pastY] = [point.x, point.y];
             const { x, y } = p;
-
+            const isNext = stones.length === 1;
+            const isStart = x === pastX && y === pastY;
             if (
                 (x >= this.size || y >= this.size || y < 0 || x < 0)
-                || (x !== pastX && y !== pastY && this.stoneMap[x][y] === StoneStatus.NONE)
-                || (stones.length === 1 && (this.stoneMap[x][y] === stone || this.stoneMap[x][y] === StoneStatus.NONE))
-            ) return;
+                || (!isStart && this.stoneMap[x][y] === StoneStatus.NONE)
+                || (isNext && (this.stoneMap[x][y] === stone || this.stoneMap[x][y] === StoneStatus.NONE))
+            ) {
+                return;
+            }
             
             if (this.stoneMap[x][y] == stone && stones.length > 1) {
                 result = true;
@@ -63,7 +66,7 @@ export class Board {
         const SW = (point: Point) => ({ x: point.x+1, y: point.y+1});
         const SE = (point: Point) => ({ x: point.x-1, y: point.y+1});
 
-        [N, W, E, S, NW, NE, SW, SE].forEach(async (func) => rev(point, func));
+        [N, W, E, S, NW, NE, SW, SE].forEach((func) => rev(point, func));
         return result;
     }
 
