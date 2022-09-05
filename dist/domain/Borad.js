@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Board = void 0;
 const StoneStats_1 = require("./model/StoneStats");
@@ -39,10 +30,13 @@ class Board {
         const rev = (p, next, stones = []) => {
             const [pastX, pastY] = [point.x, point.y];
             const { x, y } = p;
+            const isNext = stones.length === 1;
+            const isStart = x === pastX && y === pastY;
             if ((x >= this.size || y >= this.size || y < 0 || x < 0)
-                || (x !== pastX && y !== pastY && this.stoneMap[x][y] === StoneStats_1.StoneStatus.NONE)
-                || (stones.length === 1 && (this.stoneMap[x][y] === stone || this.stoneMap[x][y] === StoneStats_1.StoneStatus.NONE)))
+                || (!isStart && this.stoneMap[x][y] === StoneStats_1.StoneStatus.NONE)
+                || (isNext && (this.stoneMap[x][y] === stone || this.stoneMap[x][y] === StoneStats_1.StoneStatus.NONE))) {
                 return;
+            }
             if (this.stoneMap[x][y] == stone && stones.length > 1) {
                 result = true;
                 if (!tryFlag)
@@ -60,7 +54,7 @@ class Board {
         const NE = (point) => ({ x: point.x - 1, y: point.y - 1 });
         const SW = (point) => ({ x: point.x + 1, y: point.y + 1 });
         const SE = (point) => ({ x: point.x - 1, y: point.y + 1 });
-        [N, W, E, S, NW, NE, SW, SE].forEach((func) => __awaiter(this, void 0, void 0, function* () { return rev(point, func); }));
+        [N, W, E, S, NW, NE, SW, SE].forEach((func) => rev(point, func));
         return result;
     }
     getSquare(point) {
@@ -82,7 +76,7 @@ class Board {
         return this.stoneMap;
     }
     isEnd() {
-        return this.count()[StoneStats_1.StoneStatus.NONE] === 0;
+        return this.count()[StoneStats_1.StoneStatus.NONE] === 0 || this.count()[StoneStats_1.StoneStatus.BLACK] === 0 || this.count()[StoneStats_1.StoneStatus.WHITE] === 0;
     }
     count() {
         const result = { [StoneStats_1.StoneStatus.BLACK]: 0, [StoneStats_1.StoneStatus.WHITE]: 0, [StoneStats_1.StoneStatus.NONE]: 0 };

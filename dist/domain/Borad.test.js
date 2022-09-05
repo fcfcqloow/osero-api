@@ -413,11 +413,68 @@ describe('Board.ts', () => {
                 ],
             }
         ],
+        [
+            `
+            | | | | |B|W|B
+            | | | | |W|B| 
+            | | |B|B|W|W|B
+            | |B|W|W|W|B|W
+            |B| |B|B|B|W| 
+            | | | | | | |W
+            | | | | | | | 
+            | | | | | | |  `,
+            {
+                in: {
+                    point: { x: 7, y: 5 },
+                    color: StoneStats_1.StoneStatus.WHITE
+                },
+                exp: [
+                    {
+                        point: { x: 6, y: 4 },
+                        color: StoneStats_1.StoneStatus.WHITE,
+                    },
+                    {
+                        point: { x: 7, y: 4 },
+                        color: StoneStats_1.StoneStatus.NONE,
+                    },
+                ],
+            }
+        ],
     ])("%s", (title, testcase) => {
         board.reverse(testcase.in.point, testcase.in.color);
         console.log(board.toString());
         testcase.exp.forEach(exp => {
             expect(board.getSquare(exp.point)).toBe(exp.color);
         });
+    });
+    test('バグ１', () => {
+        const board = new Borad_1.Board();
+        function rotateClockwise(a) {
+            var n = a.length;
+            for (var i = 0; i < n / 2; i++) {
+                for (var j = i; j < n - i - 1; j++) {
+                    var tmp = a[i][j];
+                    a[i][j] = a[n - j - 1][i];
+                    a[n - j - 1][i] = a[n - i - 1][n - j - 1];
+                    a[n - i - 1][n - j - 1] = a[j][n - i - 1];
+                    a[j][n - i - 1] = tmp;
+                }
+            }
+            return a;
+        }
+        board.stoneMap = rotateClockwise([
+            [0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 1, 1, 2, 0, 1],
+            [0, 0, 0, 0, 2, 0, 1, 1],
+            [0, 0, 0, 2, 1, 1, 1, 1],
+            [0, 0, 1, 1, 1, 1, 1, 1],
+            [0, 0, 2, 0, 1, 1, 0, 1],
+            [0, 0, 0, 0, 1, 1, 2, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+        ].reverse());
+        console.log(board.toString());
+        board.reverse({ x: 5, y: 0 }, StoneStats_1.StoneStatus.BLACK);
+        expect(board.getSquare({ x: 5, y: 1 })).toBe(StoneStats_1.StoneStatus.WHITE);
+        expect(board.getSquare({ x: 5, y: 2 })).toBe(StoneStats_1.StoneStatus.NONE);
     });
 });

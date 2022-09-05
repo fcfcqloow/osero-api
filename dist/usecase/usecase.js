@@ -64,7 +64,6 @@ class UseCase {
     getGameStatus(roomId) {
         const gameInfo = this.repository.getGame(`${roomId}`);
         const color = gameInfo.game.countStones();
-        const users = Object.keys(gameInfo.userTurn);
         const black = Object.entries(gameInfo.userTurn).find(([userId, turn]) => turn === Turn_1.Turn.ONE);
         const white = Object.entries(gameInfo.userTurn).find(([userId, turn]) => turn === Turn_1.Turn.TWO);
         return {
